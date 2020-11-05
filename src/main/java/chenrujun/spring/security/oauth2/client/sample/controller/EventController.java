@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 @RequestMapping(path = { "/events" })
 public class EventController {
 
+    private final String graphBaseUrl = "https://graph.microsoft.com/v1.0%s";
     private final WebClient webClient;
 
     @Autowired
@@ -38,7 +39,7 @@ public class EventController {
         // TODO: 2020/11/2 Get the Events
 
         return this.webClient.get()
-                             .uri(URI.create("https://outlook.office.com/api/v2.0/me/events"))
+                             .uri(URI.create(this.getGraphUrl("/me/events")))
                              .retrieve()
                              .bodyToMono(String.class);
     }
@@ -48,7 +49,7 @@ public class EventController {
         // TODO: 2020/11/2 Accept the event
 
         this.webClient.post()
-                      .uri("https://outlook.office.com/api/v2.0/me/events/{event_id}/accept", eventId)
+                      .uri(this.getGraphUrl("/me/events/{event_id}/accept"), eventId)
                       .retrieve()
                       .bodyToMono(String.class)
                       .subscribe(System.out::println);
@@ -62,15 +63,19 @@ public class EventController {
         if (event == null) {
             event = Event.buildEvent("Test event", LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(1).plusHours(1));
-            //.addAttender("Tom", "tom@augend.onmicrosoft.com", true);
+            //.addAttender("User", "user@augend.onmicrosoft.com", true);
         }
 
         this.webClient.post()
-                      .uri(URI.create("https://outlook.office.com/api/v2.0/me/events"))
+                      .uri(URI.create(this.getGraphUrl("/me/events")))
                       .contentType(MediaType.APPLICATION_JSON)
                       .bodyValue(event)
                       .retrieve()
                       .bodyToMono(String.class)
                       .subscribe(System.out::println);
+    }
+
+    private String getGraphUrl(String uri) {
+        return String.format(this.graphBaseUrl, uri);
     }
 }
