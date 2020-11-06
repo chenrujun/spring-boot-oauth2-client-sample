@@ -36,8 +36,6 @@ public class EventController {
 
     @GetMapping
     Mono<?> getEvents() {
-        // TODO: 2020/11/2 Get the Events
-
         return this.webClient.get()
                              .uri(URI.create(this.getGraphUrl("/me/events")))
                              .retrieve()
@@ -45,9 +43,7 @@ public class EventController {
     }
 
     @PostMapping(path = { "/{eventId}/accept" })
-    void acceptEvent(@PathVariable String eventId, @PathVariable String attenderId) {
-        // TODO: 2020/11/2 Accept the event
-
+    void acceptEvent(@PathVariable String eventId) {
         this.webClient.post()
                       .uri(this.getGraphUrl("/me/events/{event_id}/accept"), eventId)
                       .retrieve()
@@ -57,8 +53,6 @@ public class EventController {
 
     @PostMapping
     void createEvent(Event event) {
-        // TODO: 2020/11/2 Create the event
-
         // easy to test
         if (event == null) {
             event = Event.buildEvent("Test event", LocalDateTime.now().plusDays(1),
